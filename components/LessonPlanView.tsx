@@ -20,6 +20,19 @@ interface LessonPlanViewProps {
 
 const WEEKS = Array.from({ length: 37 }, (_, i) => i + 1); // 37 Tuần học
 
+const CLASS_COLORS = [
+  'bg-blue-50 border-blue-200 text-blue-800',
+  'bg-emerald-50 border-emerald-200 text-emerald-800',
+  'bg-amber-50 border-amber-200 text-amber-800',
+  'bg-purple-50 border-purple-200 text-purple-800',
+  'bg-rose-50 border-rose-200 text-rose-800',
+  'bg-cyan-50 border-cyan-200 text-cyan-800',
+  'bg-indigo-50 border-indigo-200 text-indigo-800',
+  'bg-orange-50 border-orange-200 text-orange-800',
+];
+
+const getClassColor = (index: number) => CLASS_COLORS[index % CLASS_COLORS.length];
+
 // Templates for Review
 const REVIEW_TEMPLATES = [
   { label: '👍 Tốt', text: 'Ưu điểm: Học sinh tham gia bài sôi nổi, hiểu bài.\nHạn chế: Không.\nĐiều chỉnh: Phát huy phương pháp hiện tại.' },
@@ -46,7 +59,7 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
   const [showAddPlanModal, setShowAddPlanModal] = useState(false);
   const [showEditPlanModal, setShowEditPlanModal] = useState(false);
   const [showClassManager, setShowClassManager] = useState(false);
-  const [showMobileTools, setShowMobileTools] = useState(false);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
   
   // Bulk Actions State
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -456,12 +469,6 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                >
                  <Icons.Trash />
                </button>
-               <button 
-                onClick={() => setShowMobileTools(!showMobileTools)}
-                className="md:hidden p-1.5 hover:bg-slate-100 rounded-md text-slate-500"
-              >
-                <Icons.Settings />
-              </button>
             </div>
           </div>
           <button 
@@ -490,19 +497,30 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
         </div>
 
         {/* TOOLS */}
-        <div className={`p-4 border-t border-slate-200 bg-blue-50 transition-all ${showMobileTools ? 'block' : 'hidden md:block'}`}>
-           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Nhập / Xuất</h3>
-           <div className="space-y-2">
-              <button onClick={downloadTemplate} className="w-full flex items-center gap-2 text-xs bg-white border border-slate-200 p-2 rounded hover:bg-slate-50 transition-colors text-slate-900"><Icons.Download /> Tải mẫu Excel</button>
-              <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center gap-2 text-xs bg-white border border-slate-200 p-2 rounded hover:bg-slate-50 transition-colors text-slate-900"><Icons.Upload /> Nhập Excel</button>
-              <input type="file" hidden ref={fileInputRef} accept=".xlsx, .xls" onChange={handleFileUpload} />
-              
-              <div className="h-[1px] bg-slate-200 my-1"></div>
-              
-              <button onClick={exportExcel} className="w-full flex items-center gap-2 text-xs bg-emerald-600 text-white border border-transparent p-2 rounded hover:bg-emerald-700 transition-colors"><Icons.Table /> Xuất Excel</button>
-              <button onClick={exportWord} className="w-full flex items-center gap-2 text-xs bg-blue-600 text-white border border-transparent p-2 rounded hover:bg-blue-700 transition-colors"><Icons.FileText /> Xuất Word (.doc)</button>
-              <button onClick={handlePrint} className="w-full flex items-center gap-2 text-xs bg-slate-700 text-white border border-transparent p-2 rounded hover:bg-slate-800 transition-colors"><div className="scale-75"><Icons.Search /></div> Xem & In (PDF)</button>
-           </div>
+        <div className="border-t border-slate-200 bg-blue-50 transition-all">
+           <button 
+             onClick={() => setIsToolsExpanded(!isToolsExpanded)}
+             className="w-full p-4 flex items-center justify-between text-xs font-bold text-slate-600 uppercase tracking-wider hover:bg-blue-100 transition-colors"
+           >
+             <span className="flex items-center gap-2"><Icons.Settings /> Nhập / Xuất</span>
+             <div className={`transform transition-transform ${isToolsExpanded ? 'rotate-180' : ''}`}>
+               <Icons.ChevronDown />
+             </div>
+           </button>
+           
+           {isToolsExpanded && (
+             <div className="px-4 pb-4 space-y-2 animate-[fadeIn_0.2s_ease-out]">
+                <button onClick={downloadTemplate} className="w-full flex items-center gap-2 text-xs bg-white border border-slate-200 p-2 rounded hover:bg-slate-50 transition-colors text-slate-900"><Icons.Download /> Tải mẫu Excel</button>
+                <button onClick={() => fileInputRef.current?.click()} className="w-full flex items-center gap-2 text-xs bg-white border border-slate-200 p-2 rounded hover:bg-slate-50 transition-colors text-slate-900"><Icons.Upload /> Nhập Excel</button>
+                <input type="file" hidden ref={fileInputRef} accept=".xlsx, .xls" onChange={handleFileUpload} />
+                
+                <div className="h-[1px] bg-slate-200 my-1"></div>
+                
+                <button onClick={exportExcel} className="w-full flex items-center gap-2 text-xs bg-emerald-600 text-white border border-transparent p-2 rounded hover:bg-emerald-700 transition-colors"><Icons.Table /> Xuất Excel</button>
+                <button onClick={exportWord} className="w-full flex items-center gap-2 text-xs bg-blue-600 text-white border border-transparent p-2 rounded hover:bg-blue-700 transition-colors"><Icons.FileText /> Xuất Word (.doc)</button>
+                <button onClick={handlePrint} className="w-full flex items-center gap-2 text-xs bg-slate-700 text-white border border-transparent p-2 rounded hover:bg-slate-800 transition-colors"><div className="scale-75"><Icons.Search /></div> Xem & In (PDF)</button>
+             </div>
+           )}
         </div>
       </div>
 
@@ -569,16 +587,17 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
              </div>
           ) : (
              <div className="space-y-6">
-                {classes.map(cls => {
+                {classes.map((cls, idx) => {
                    const plans = currentWeekPlans.filter(p => p.classId === cls.id);
+                   const colorClass = getClassColor(idx);
                    // Show class section even if empty? Better to show it so user knows they have a class.
                    return (
-                      <div key={cls.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                         <div className="bg-slate-50 px-4 py-2 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                      <div key={cls.id} className={`bg-white rounded-xl border shadow-sm overflow-hidden ${colorClass.split(' ')[1]}`}>
+                         <div className={`px-4 py-2 border-b flex justify-between items-center ${colorClass}`}>
+                            <h3 className="font-bold flex items-center gap-2">
                                <Icons.Users /> Lớp {cls.name}
                             </h3>
-                            <span className="text-xs font-medium text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
+                            <span className="text-xs font-medium bg-white/50 px-2 py-1 rounded border border-white/20">
                                {plans.length} mục
                             </span>
                          </div>
