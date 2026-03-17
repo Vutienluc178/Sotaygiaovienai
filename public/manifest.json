@@ -1,0 +1,17 @@
+{
+  "name": "Sổ Tay Giáo Viên AI",
+  "short_name": "Sổ Tay GV",
+  "description": "Sổ tay kỹ thuật số tích hợp AI dành cho giáo viên",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
